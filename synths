@@ -1,0 +1,42 @@
+s.boot();
+
+// Piano
+(
+SynthDef(\piano, { |freq=440, amp=0.3, out=0|
+    var env = Env.perc(0.005, 2.5, amp, -4).kr;
+    var tone = Mix([
+        Saw.ar(freq, 0.3),
+        SinOsc.ar(freq * 2, 0, 0.2)
+    ]);
+    var hammer = Decay2.ar(Impulse.ar(0), 0.001, 0.05, WhiteNoise.ar(0.2)); // percussive attack
+    var sig = (tone + hammer) * env;
+    sig = LPF.ar(sig, 5000);
+    Out.ar(out, sig!2);
+}).add;
+)
+
+(
+// Kick drum
+SynthDef(\kick, { |out=0|
+    var env = Env.perc(0.001, 0.3, 1, -4).kr;
+    var sig = SinOsc.ar(60, 0, env * 0.8);
+    sig = sig + WhiteNoise.ar(0.02) * env;
+    Out.ar(out, sig!2);
+}).add;
+
+// Snare drum
+SynthDef(\snare, { |out=0|
+    var env = Env.perc(0.001, 0.2, 1, -4).kr;
+    var noise = WhiteNoise.ar(0.4) * env;
+    noise = HPF.ar(noise, 200);
+    Out.ar(out, noise!2);
+}).add;
+
+// Hi-hat
+SynthDef(\hihat, { |out=0|
+    var env = Env.perc(0.001, 0.05, 1, -4).kr;
+    var noise = WhiteNoise.ar(0.2) * env;
+    noise = HPF.ar(noise, 5000);
+    Out.ar(out, noise!2);
+}).add;
+)
